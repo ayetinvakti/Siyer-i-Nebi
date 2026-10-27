@@ -36,7 +36,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title data-i18n="page_title">Siyer-i Nebi | Ayetin Vakti</title>
-    
+
     <meta property="og:title" content="Siyer-i Nebi | Ayetin Vakti">
     <meta property="og:description" content="Peygamber Efendimiz'in (SAV) hayatı, tüm gazveleri, örnek ahlakı ve asr-ı saadet kıssaları.">
     <meta property="og:type" content="website">
@@ -172,6 +172,8 @@
             font-size: 0.9rem;
             outline: none;
             box-shadow: var(--shadow);
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         .search-input::placeholder {
@@ -242,6 +244,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
         }
 
         .siyer-card-title span.badge {
@@ -252,6 +255,7 @@
             border-radius: 8px;
             color: var(--accent-color);
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .siyer-card-desc {
@@ -319,6 +323,11 @@
             padding-right: 10px;
         }
 
+        [dir="rtl"] .modal-title-text {
+            padding-right: 0;
+            padding-left: 10px;
+        }
+
         .close-modal-btn {
             background: var(--btn-bg);
             border: 1px solid var(--border-color);
@@ -339,6 +348,11 @@
             line-height: 1.7;
             color: var(--text-color);
             white-space: pre-line;
+        }
+
+        [dir="rtl"] .modal-body-text {
+            line-height: 2;
+            font-size: 1.02rem;
         }
     </style>
 </head>
@@ -402,7 +416,9 @@
             tab_mekke: "Mekke",
             tab_medine: "Medine",
             tab_ahlak: "Ahlak",
-            tab_veda: "Veda"
+            tab_veda: "Veda",
+            search_ph: "Arşivde ara (Örn: Bedir, Uhud, Hz. Hatice)...",
+            no_result: "Aradığınız kriterde konu bulunamadı."
         },
         en: {
             page_title: "Seerah | Ayetin Vakti",
@@ -413,7 +429,9 @@
             tab_mekke: "Meccan",
             tab_medine: "Medinan",
             tab_ahlak: "Character",
-            tab_veda: "Farewell"
+            tab_veda: "Farewell",
+            search_ph: "Search the archive (e.g. Badr, Uhud, Khadijah)...",
+            no_result: "No topics found for your search."
         },
         ar: {
             page_title: "السيرة النبوية | آية الوقت",
@@ -424,14 +442,16 @@
             tab_mekke: "العهد المكي",
             tab_medine: "العهد المدني",
             tab_ahlak: "الأخلاق",
-            tab_veda: "الوفاة"
+            tab_veda: "الوفاة",
+            search_ph: "ابحث في الأرشيف (مثال: بدر، أحد، خديجة)...",
+            no_result: "لم يتم العثور على نتائج."
         }
     };
 
     const activeLang = localStorage.getItem('user_lang') || 'tr';
     const t = translations[activeLang] || translations['tr'];
 
-    // Gerçek Kaynaklara Dayalı Kapsamlı Dev Siyer Veritabanı
+    // Siyer Veritabanı
     const siyerData = [
         {
             id: 1,
@@ -444,8 +464,8 @@
             descEn: "The noble lineage of the Prophet and Abraha's failed expedition against the Kaaba.",
             descAr: "نسب النبي الكريم إلى إبراهيم عليه السلام وقصة أصحاب الفيل.",
             contentTr: "Peygamber Efendimiz Hz. Muhammed Mustafa (SAV), Hz. İbrahim'in oğlu Hz. İsmail'e uzanan seçkin bir nesep zincirine sahiptir. Babası Abdullah, annesi Âmine binti Vehb'dir. Doğumundan kısa süre önce Ebrehe, Kâbe'yi yıkmak üzere fil ordusuyla Mekke'ye gelmiş, ancak Ebâbil kuşları ile helak edilmiştir. Bu olay 'Fil Vak'ası' olarak tarihe geçmiştir.",
-            contentEn: "Detailed English text about lineage and Year of the Elephant...",
-            contentAr: "النص التفصيلي باللغة العربية عن النسب وعام الفيل..."
+            contentEn: "Prophet Muhammad (PBUH) descends from Prophet Ishmael, son of Prophet Abraham, through the noble line of Quraysh. His father was Abdullah and his mother was Aminah bint Wahb. Shortly before his birth, Abraha marched on Mecca with an army and elephants to demolish the Kaaba, but his army was destroyed by flocks of birds (Ababil). This event is known as the Year of the Elephant.",
+            contentAr: "هو محمد بن عبدالله بن عبدالمطلب بن هاشم من قريش، وينتهي نسبه إلى إسماعيل بن إبراهيم عليهما السلام. أمه آمنة بنت وهب. وقبيل مولده قدم أبرهة بجيشه ومعه الفيلة لهدم الكعبة، فأهلكه الله بالطير الأبابيل، فسُمّي ذلك العام عام الفيل."
         },
         {
             id: 2,
@@ -456,10 +476,10 @@
             badgeTr: "Doğuş", badgeEn: "Birth", badgeAr: "المولد",
             descTr: "Rebiülevvel ayının 12. Pazartesi gecesi Mekke'de doğumu ve doğuştan gelen hikmetler.",
             descEn: "Birth in Mecca on the 12th of Rabi' al-Awwal and growing up as an orphan.",
-            descAr: "ولادته في فجر الاثنين من ربیع الأول ووفاة أبيه عبدالله.",
-            contentTr: "Efendimiz (SAV), miladi 571 yılı Rebiülevvel ayının 12. Pazartesi sabaha karşı Mekke'de dünyayı teşrif etti. Babası Abdullah, ticaret için gittiği Medine'den dönerken hastalanıp vefat etmişti. Bu sebeple dünyaya yetim olarak gözlerini açdı. Dedesinin himayesinde kutsal bir atmosferde büyümeye başladı.",
-            contentEn: "Detailed English text about his birth...",
-            contentAr: "النص التفصيلي باللغة العربية عن مولده..."
+            descAr: "ولادته في فجر الاثنين من ربيع الأول ووفاة أبيه عبدالله.",
+            contentTr: "Efendimiz (SAV), yaklaşık miladi 571 yılında Rebiülevvel ayının 12. Pazartesi sabaha karşı Mekke'de dünyayı teşrif etti. Babası Abdullah, ticaret için gittiği Medine'den dönerken hastalanıp vefat etmişti. Bu sebeple dünyaya yetim olarak gözlerini açtı. Dedesi Abdülmuttalib'in himayesinde büyümeye başladı.",
+            contentEn: "The Prophet (PBUH) was born in Mecca around 571 CE, in the early hours of a Monday, the 12th of Rabi' al-Awwal. His father Abdullah had passed away on a trading journey, so he came into the world as an orphan. He began to grow up under the care of his grandfather Abdul-Muttalib.",
+            contentAr: "وُلد النبي ﷺ في مكة المكرمة فجر يوم الاثنين الثاني عشر من ربيع الأول، نحو سنة 571م. وكان أبوه عبدالله قد توفي قبل مولده بعد عودته من رحلة تجارية، فنشأ يتيماً في كفالة جده عبدالمطلب."
         },
         {
             id: 3,
@@ -471,9 +491,9 @@
             descTr: "Halime Hatun'un yanında geçen bereketli yıllar ve melekler tarafından kalbinin yıkanması mucizesi.",
             descEn: "Blessed years with Halimah and the miraculous purification of his heart.",
             descAr: "سنوات الرضاعة في بادية بني سعد ومعجزة شق الصدر.",
-            contentTr: "Mekke geleneklerine göre çöl havası alması ve fasih Arapça öğrenmesi için Sa'd kabilesinden Halime Hatun'a verildi. O'nun gelişiyle Halime'nin evi ve hayvanları bolluğa kavuştu. Yaklaşık 4 veya 5 yaşlarındayken sahra ortasında melekler tarafından göğsü yarılarak kalbi zemzemle yıkanmış ve manevi kirlerden arındırılmıştır (Şakk-ı Sadr).",
-            contentEn: "Detailed English text about nursing and chest splitting...",
-            contentAr: "النص التفصيلي باللغة العربية عن حادثة شق الصدر..."
+            contentTr: "Mekke geleneklerine göre çöl havası alması ve fasih Arapça öğrenmesi için Sa'd oğulları kabilesinden Halime Hatun'a verildi. O'nun gelişiyle Halime'nin evi ve hayvanları bolluğa kavuştu. Yaklaşık 4 veya 5 yaşlarındayken melekler tarafından göğsü yarılarak kalbi zemzemle yıkanmış ve manevi kirlerden arındırılmıştır (Şakk-ı Sadr).",
+            contentEn: "Following Meccan custom, he was entrusted to Halimah of the Banu Sa'd tribe so that he could grow up in the clean desert air and learn pure Arabic. Her household and flocks were blessed with abundance. Around the age of four or five, angels opened his chest, washed his heart with Zamzam water and purified it (Shaqq as-Sadr).",
+            contentAr: "استُرضع النبي ﷺ في بادية بني سعد عند حليمة السعدية، فنشأ فصيحاً قوي البنية، وحلّت البركة في بيتها. وفي نحو الرابعة من عمره شقّ الملكان صدره وغسلا قلبه بماء زمزم وطهّراه."
         },
         {
             id: 4,
@@ -482,12 +502,12 @@
             titleEn: "Loss of Mother and Grandfather, Protection of Abu Talib",
             titleAr: "وفاة أمه وجده وكفالة عمّه أبي طالب",
             badgeTr: "Çocukluk", badgeEn: "Childhood", badgeAr: "الطفولة",
-            descTr: "6 yaşında annesi Âmine'yi, 8 yaşında dedesi Abdülmuttalip'i kaybetmesi ve amcası Ebu Talib'in yanında büyümesi.",
+            descTr: "6 yaşında annesi Âmine'yi, 8 yaşında dedesi Abdülmuttalib'i kaybetmesi ve amcası Ebu Talib'in yanında büyümesi.",
             descEn: "Losing his mother at 6, grandfather at 8, and coming under the care of his uncle Abu Talib.",
             descAr: "وفاة أمه آمنة بالأبواء وجده عبدالمطلب وكفالة أبي طالب له.",
-            contentTr: "6 yaşına geldiğinde annesi Âmine Hatun ile birlikte Medine'deki akrabalarını ve babasının kabrini ziyarete gitti. Dönüşte Ebva köyünde annesi vefat etti. Mekke'ye döndükten 2 yıl sonra ise dedesi Abdülmuttalip vefat etti ve vasiyeti üzerine amcası Ebu Talib'in himayesine verildi.",
-            contentEn: "Detailed English text about his early losses...",
-            contentAr: "النص التفصيلي باللغة العربية عن كفالة أبي طالب..."
+            contentTr: "6 yaşına geldiğinde annesi Âmine Hatun ile birlikte Medine'deki akrabalarını ve babasının kabrini ziyarete gitti. Dönüşte Ebvâ'da annesi vefat etti. Mekke'ye döndükten sonra, 8 yaşındayken dedesi Abdülmuttalib de vefat etti ve vasiyeti üzerine amcası Ebu Talib'in himayesine verildi.",
+            contentEn: "At the age of six he travelled with his mother Aminah to visit relatives in Medina and his father's grave. On the way back, she passed away at Abwa. At the age of eight he also lost his grandfather Abdul-Muttalib, and by his grandfather's wish he came under the protection of his uncle Abu Talib.",
+            contentAr: "في السادسة من عمره خرجت به أمه آمنة لزيارة أخواله في المدينة وقبر أبيه، وفي طريق العودة توفيت بالأبواء. ثم كفله جده عبدالمطلب إلى أن توفي وللنبي ﷺ ثماني سنوات، فأوصى به إلى عمه أبي طالب."
         },
         {
             id: 5,
@@ -499,9 +519,9 @@
             descTr: "Mekke toplumunda dürüstlüğüyle 'el-Emîn' unvanını alması ve mazlumları korumak için kurulan Hilfü'l-Fudul.",
             descEn: "Earning the title 'Al-Amin' (The Trustworthy) and participating in the League of the Virtuous.",
             descAr: "صفاته في الشباب وحلف الفضول لنصرة المظلومين وتلقيبه بالأمين.",
-            contentTr: "Gençlik yıllarında putperestliğin ve Mekke'nin çirkin âdetlerinden tamamen uzak durdu. Ticaretle uğraştı ve asil dürüstlüğü sayesinde halk arasında 'el-Emîn' (Güvenilir) olarak anıldı. Mekke'de zulme uğrayanların hakkını aramak için kurulan adalet teşkilatı 'Hilfü'l-Fudul' (Erdemliler Antlaşması) çalışmalarına aktif katıldı.",
-            contentEn: "Detailed English text about his youth...",
-            contentAr: "النص التفصيلي باللغة العربية عن شبابه ولقب الأمين..."
+            contentTr: "Gençlik yıllarında putperestliğin ve câhiliye âdetlerinin çirkinliklerinden uzak durdu. Çobanlık ve ticaretle uğraştı; dürüstlüğü sayesinde halk arasında 'el-Emîn' (Güvenilir) olarak anıldı. Mekke'de zulme uğrayanların hakkını korumak için kurulan 'Hilfü'l-Fudul' (Erdemliler Antlaşması)'nda yer aldı.",
+            contentEn: "In his youth he kept away from idol worship and the ugly customs of pre-Islamic Arabia. He worked as a shepherd and a trader, and his honesty earned him the title 'Al-Amin' (The Trustworthy). He took part in the Hilf al-Fudul, the pact formed to defend the rights of the oppressed in Mecca.",
+            contentAr: "نشأ بعيداً عن عبادة الأصنام وعادات الجاهلية، واشتغل بالرعي ثم بالتجارة، واشتهر بالصدق والأمانة حتى لقّبه قومه بالأمين. وشهد حلف الفضول الذي عُقد لنصرة المظلومين ورد الحقوق إلى أصحابها."
         },
         {
             id: 6,
@@ -513,9 +533,9 @@
             descTr: "Hz. Hatice'nin ticaret kervanını yönetmesi, dürüstlüğünden etkilenerek evlilik teklif etmesi ve kutlu yuva.",
             descEn: "Managing Khadijah's trade caravan and their blessed marriage.",
             descAr: "إدارته لتجارة خديجة وزواجه المبارك منها وإنجاب الأولاد.",
-            contentTr: "Şam ticaret kervanını büyük bir başarı ve dürüstlükle idare etmesi üzerine Hz. Hatice validemiz O'na evlilik teklifinde bulundu. Bu evlilikten Kasım, Zeynep, Rukiyye, Ümmü Gülsüm, Fatıma ve Abdullah (Tayyib/Tahir) dünyaya geldi. Hz. Hatice, Peygamberimizin en büyük destekçisi oldu.",
-            contentEn: "Detailed English text about marriage to Khadijah...",
-            contentAr: "النص التفصيلي باللغة العربية عن زواجه بخديجة..."
+            contentTr: "Hz. Hatice'nin Şam'a giden ticaret kervanını büyük bir başarı ve dürüstlükle idare etmesi üzerine Hz. Hatice validemiz O'na evlilik teklifinde bulundu. Bu evlilikten Kasım, Zeynep, Rukiyye, Ümmü Gülsüm, Fatıma ve Abdullah dünyaya geldi. Hz. Hatice, Peygamberimizin en büyük destekçisi oldu.",
+            contentEn: "After he managed Khadijah's trade caravan to Syria with great success and honesty, Khadijah proposed marriage to him. From this marriage were born Qasim, Zaynab, Ruqayyah, Umm Kulthum, Fatimah and Abdullah. Khadijah became the Prophet's greatest supporter.",
+            contentAr: "سافر في تجارة خديجة رضي الله عنها إلى الشام فأدارها بأمانة ونجاح، فرغبت في الزواج منه فتزوجها. ورُزق منها القاسم وزينب ورقية وأم كلثوم وفاطمة وعبدالله. وكانت خديجة أعظم عون له في الدعوة."
         },
         {
             id: 7,
@@ -527,9 +547,9 @@
             descTr: "40 yaşında Nur Dağı'nda Cebrail (AS) ile karşılaşması ve Alak Suresi'nin ilk ayetlerinin nazil olması.",
             descEn: "Encountering Gabriel at age 40 and the revelation of the first verses of Surah Al-Alaq.",
             descAr: "نزول سورة العلق وبداية النبوة في شهر رمضان المبارك.",
-            contentTr: "40 yaşına erdiğinde ibadet ve tefekkür için Nur Dağı Hira Mağarası'na çekilmeyi tercih etti. Ramazan ayında Cebrail (AS) gelerek 'Oku!' buyurdu. Efendimiz 'Ben okuma bilmem' deyince melek O'nu kucaklayıp bıraktı ve bu üç kez tekrarlandı. Ardından Alak Suresi'nin ilk 5 ayeti nazil olarak risalet görevi başladı.",
-            contentEn: "Detailed English text about the first revelation...",
-            contentAr: "النص التفصيلي باللغة العربية عن أول الوحي..."
+            contentTr: "40 yaşına erdiğinde ibadet ve tefekkür için Nur Dağı'ndaki Hira Mağarası'na çekilirdi. Ramazan ayında Cebrail (AS) gelerek 'Oku!' buyurdu. Efendimiz 'Ben okuma bilmem' deyince melek O'nu kucaklayıp bıraktı ve bu üç kez tekrarlandı. Ardından Alak Suresi'nin ilk 5 ayeti nazil oldu ve risalet görevi başladı.",
+            contentEn: "When he reached the age of forty, he would retreat to the Cave of Hira on Mount Nur for worship and reflection. In Ramadan, Gabriel (AS) came and said, 'Read!' The Prophet replied, 'I cannot read.' The angel embraced him tightly and released him, and this was repeated three times. Then the first five verses of Surah Al-Alaq were revealed and his mission began.",
+            contentAr: "بلغ الأربعين فكان يتعبد في غار حراء بجبل النور. وفي شهر رمضان جاءه جبريل عليه السلام فقال: اقرأ، فقال: ما أنا بقارئ، فضمّه ثلاث مرات، ثم نزلت أوائل سورة العلق، وبدأت بذلك النبوة."
         },
         {
             id: 8,
@@ -538,12 +558,12 @@
             titleEn: "Secret Preaching and House of Arqam",
             titleAr: "الدعوة السرية ودار الأرقم بن أبي الأرقم",
             badgeTr: "Mekke", badgeEn: "Mecca", badgeAr: "مكة",
-            descTr: "İslam'ın ilk 3 yılında tebliğin gizli yürütülmesi, ilk Müslümanlar ve Erkam'ın evinin karargâh yapılması.",
+            descTr: "İslam'ın ilk yıllarında tebliğin gizli yürütülmesi, ilk Müslümanlar ve Erkam'ın evinin merkez yapılması.",
             descEn: "Secret preaching for three years and using Arqam's house as the center.",
             descAr: "بدء الدعوة سراً واجتماع المسلمين الأوائل في دار الأرقم.",
-            contentTr: "İlk aşamada yakın çevresinden başlayarak İslam'ı gizlice tebliğ etti. İlk iman edenler Hz. Hatice, Hz. Ali, Hz. Ebû Bekir ve azatlısı Zeyd bin Hârise oldu. Sayı arttıkça Safa tepesi eteklerindeki Erkam'ın evi Müslümanların sığınağı, ibadet ve eğitim merkezi haline geldi.",
-            contentEn: "Detailed English text about secret preaching...",
-            contentAr: "النص التفصيلي باللغة العربية عن الدعوة السرية..."
+            contentTr: "İlk aşamada yaklaşık üç yıl boyunca yakın çevresinden başlayarak İslam'ı gizlice tebliğ etti. İlk iman edenler Hz. Hatice, Hz. Ali, Hz. Ebû Bekir ve azatlısı Zeyd bin Hârise oldu. Sayı arttıkça Safa tepesi yakınındaki Erkam'ın evi Müslümanların ibadet ve eğitim merkezi haline geldi.",
+            contentEn: "For roughly the first three years he preached Islam in secret, starting with those closest to him. The first to believe were Khadijah, Ali, Abu Bakr and his freed servant Zayd ibn Harithah. As their numbers grew, the house of Arqam near Mount Safa became the center of worship and instruction for the Muslims.",
+            contentAr: "بدأ الدعوة سراً نحو ثلاث سنوات، فآمن به أولاً خديجة وعلي بن أبي طالب وأبو بكر الصديق وزيد بن حارثة رضي الله عنهم. واتخذ المسلمون دار الأرقم بن أبي الأرقم عند الصفا مركزاً للعبادة والتعليم."
         },
         {
             id: 9,
@@ -556,8 +576,8 @@
             descEn: "Public call to Islam from Mount Safa and the onset of Quraysh persecution.",
             descAr: "الجهر بالدعوة إثر نزول قوله تعالى (فاصدع بما تؤمر) ومعارضة قريش.",
             contentTr: "'Şimdi sana emrolunanı açıkça söyle ve müşriklere aldırış etme' (Hicr, 94) ayeti inince Peygamberimiz Safa tepesine çıkarak Kureyş kabilelerini İslam'a çağırdı. Ebû Leheb ve önde gelenler karşı çıktı. Bunun üzerine Müslümanlara yönelik hakaret, boykot ve işkence dönemi başladı.",
-            contentEn: "Detailed English text about public preaching...",
-            contentAr: "النص التفصيلي باللغة العربية عن الجهر بالدعوة..."
+            contentEn: "When the verse 'So proclaim openly what you are commanded and turn away from the polytheists' (Al-Hijr, 94) was revealed, the Prophet climbed Mount Safa and called the tribes of Quraysh to Islam. Abu Lahab and other leaders opposed him, and a period of insults, boycott and torture against the Muslims began.",
+            contentAr: "لما نزل قوله تعالى «فَاصْدَعْ بِمَا تُؤْمَرُ وَأَعْرِضْ عَنِ الْمُشْرِكِينَ» صعد النبي ﷺ الصفا ودعا قريشاً إلى الإسلام، فعارضه أبو لهب وغيره، وبدأت قريش تؤذي المسلمين بالسخرية والمقاطعة والتعذيب."
         },
         {
             id: 10,
@@ -569,9 +589,9 @@
             descTr: "Müşriklerin zulmünden kaçan Müslümanların Habeşistan'a göçü ve Ebu Talib ile Hz. Hatice'nin vefatı.",
             descEn: "Migration of persecuted Muslims to Abyssinia and the passing of Abu Talib and Khadijah.",
             descAr: "هجرة الصحابة إلى الحبشة ووفاة أبي طالب وزوجته خديجة في عام واحد.",
-            contentTr: "Baskıların artması üzerine Hz. Osman liderliğinde bir grup Müslüman iki defa Habeşistan'a hicret etti; Necaşi onlara adil davranıp sığınma hakkı tanıdı. Hicretin 10. yılında ise hem amcası Ebu Talib'i hem de en büyük dayanağı Hz. Hatice'yi peş peşe kaybeden Efendimiz bu yıla 'Hüzün Yılı' (Amü'l-Hüzn) dedi.",
-            contentEn: "Detailed English text about Abyssinia and Year of Sorrow...",
-            contentAr: "النص التفصيلي باللغة العربية عن الهجرة إلى الحبشة وعام الحزن..."
+            contentTr: "Baskıların artması üzerine bir grup Müslüman iki defa Habeşistan'a hicret etti (ilkinde Hz. Osman ve Hz. Rukiyye de vardı); Necaşi onlara adil davranıp sığınma hakkı tanıdı. Peygamberliğin 10. yılında ise hem amcası Ebu Talib'i hem de en büyük dayanağı Hz. Hatice'yi peş peşe kaybeden Efendimiz bu yıla 'Hüzün Yılı' (Âmü'l-Hüzn) dedi.",
+            contentEn: "As the pressure increased, a group of Muslims migrated to Abyssinia twice (Uthman and Ruqayyah were among the first group), and the Negus treated them justly and granted them refuge. In the 10th year of his prophethood, the Prophet lost both his uncle Abu Talib and his greatest support Khadijah in quick succession, and he called that year the 'Year of Sorrow' (Aam al-Huzn).",
+            contentAr: "اشتد الأذى على المسلمين فهاجرت مجموعة منهم إلى الحبشة مرتين، منهم عثمان بن عفان ورقية رضي الله عنهما، فأكرمهم النجاشي. وفي السنة العاشرة من البعثة توفي أبو طالب ثم خديجة رضي الله عنها، فسمّى النبي ﷺ ذلك العام عام الحزن."
         },
         {
             id: 11,
@@ -583,9 +603,9 @@
             descTr: "Taif'te taşlanmasına rağmen sabretmesi ve Mescid-i Haram'dan Mescid-i Aksa'ya, oradan semaya yükselişi.",
             descEn: "Enduring hardship in Taif and the miraculous nocturnal journey and ascension.",
             descAr: "رحلته إلى الطائف ثم معجزة الإسراء والمعراج وفرض الصلوات الخمس.",
-            contentTr: "Mekke'de umut kalmayınca İslam'ı yaymak için Taif'e gitti, ancak taşlanarak şehirden çıkarıldı. Meleklerin dağı yok etme teklifini merhametle reddetti. Bu hüzünlü dönemde ilahi bir ikram olarak İsrâ ve Miraç gerçekleşti; Mescid-i Haram'dan Mescid-i Aksa'ya, oradan semaya yükselerek beş vakit namaz farz kılındı.",
-            contentEn: "Detailed English text about Taif and Isra-Miraj...",
-            contentAr: "النص التفصيلي باللغة العربية عن الإسراء والمعراج..."
+            contentTr: "Mekke'de umut kalmayınca İslam'ı anlatmak için Taif'e gitti, ancak taşlanarak şehirden çıkarıldı. Dağların meleğinin onları helak etme teklifini merhametle reddetti. Bu zor dönemin ardından ilahi bir ikram olarak İsrâ ve Miraç gerçekleşti; Mescid-i Haram'dan Mescid-i Aksa'ya, oradan semaya yükseldi ve beş vakit namaz farz kılındı.",
+            contentEn: "With little hope left in Mecca, he went to Taif to share Islam, but he was stoned and driven out of the city. He mercifully refused the offer of the angel of the mountains to destroy its people. After this hardship came the Isra and Miraj as a divine honor: he was taken from Masjid al-Haram to Masjid al-Aqsa and then ascended through the heavens, and the five daily prayers were made obligatory.",
+            contentAr: "خرج النبي ﷺ إلى الطائف يدعو أهلها فردّوه وآذوه بالحجارة، فرفض أن يُطبق عليهم الأخشبين، ورجا أن يخرج الله من أصلابهم من يعبده. ثم أكرمه الله بالإسراء من المسجد الحرام إلى المسجد الأقصى والمعراج إلى السماوات العلى، وفُرضت الصلوات الخمس."
         },
         {
             id: 12,
@@ -597,9 +617,9 @@
             descTr: "Medineli Müslümanların Akabe'de Peygamberimize biat etmesi ve Medine'ye hicret yolunun açılması.",
             descEn: "The Pledges of Aqabah with people of Medina, paving the way for Hijra.",
             descAr: "بيعة العقبة الأولى والثانية وتمهيد الطريق للهجرة إلى المدينة.",
-            contentTr: "Hac mevsiminde Mekke'ye gelen Medineli Hazreç ve Evs kabilelerinden heyetler, Akabe'de Peygamberimizle gizlice görüşerek İslamiyet'i kabul ettiler ve O'nu koruyacaklarına dair söz verdiler (1. ve 2. Akabe Biatları). Bu biatlarla Medine, İslam için güvenli bir üs haline geldi.",
-            contentEn: "Detailed English text about Pledges of Aqabah...",
-            contentAr: "النص التفصيلي باللغة العربية عن بيعتي العقبة..."
+            contentTr: "Hac mevsiminde Mekke'ye gelen Medineli Hazreç ve Evs kabilelerinden heyetler, Akabe'de Peygamberimizle gizlice görüşerek İslam'ı kabul ettiler ve O'nu koruyacaklarına dair söz verdiler (1. ve 2. Akabe Biatları). Bu biatlarla Medine, İslam için güvenli bir yurt haline geldi.",
+            contentEn: "During the pilgrimage season, delegations from the Khazraj and Aws tribes of Medina met the Prophet secretly at Aqabah, accepted Islam and pledged to protect him (the First and Second Pledges of Aqabah). With these pledges, Medina became a safe home for Islam.",
+            contentAr: "لقي النبي ﷺ في موسم الحج وفوداً من الخزرج والأوس عند العقبة فأسلموا، ثم كانت بيعة العقبة الأولى والثانية التي عاهدوه فيها على نصرته وحمايته، فصارت المدينة مأوى آمناً للإسلام."
         },
         {
             id: 13,
@@ -611,9 +631,9 @@
             descTr: "Müşriklerin suikast planını bozarak Hz. Ebû Bekir ile Sevr Mağarası'na sığınmaları ve Medine'ye varış.",
             descEn: "Evading Quraysh assassins, sheltering in Cave of Thawr, and arriving in Medina.",
             descAr: "خروج النبي مع أبي بكر إلى غار ثور والوصول إلى المدينة المنورة.",
-            contentTr: "Müşrikler suikast planı yaparken Hz. Ali'yi yatağına bırakıp Hz. Ebû Bekir ile Sevr Mağarası'na gizlendi. Müşrikler mağara kapısına kadar geldiğinde Allah'ın korumasıyla (örümcek ağı ve güvercin yuvası) kurtuldular. 12 Eylül 622'de Kuba'ya, ardından Medine'ye ulaştılar. Bu olay hicri takvimin başlangıcı oldu.",
-            contentEn: "Detailed English text about Hijra and Cave of Thawr...",
-            contentAr: "النص التفصيلي باللغة العربية عن الهجرة وغار ثور..."
+            contentTr: "Müşrikler suikast planı yaparken Hz. Ali'yi yatağına bırakıp Hz. Ebû Bekir ile Sevr Mağarası'na gizlendi. Müşrikler mağaranın yakınına kadar geldiğinde Allah'ın korumasıyla kurtuldular. Eylül 622'de önce Kuba'ya, ardından Medine'ye ulaştılar. Bu olay hicri takvimin başlangıcı oldu.",
+            contentEn: "While the polytheists plotted to assassinate him, the Prophet left Ali in his bed and hid in the Cave of Thawr with Abu Bakr. Although the Quraysh trackers came close to the cave, the two were saved by Allah's protection. In September 622 they reached Quba and then Medina. This event marks the start of the Hijri calendar.",
+            contentAr: "دبّرت قريش مؤامرة لقتل النبي ﷺ، فترك علياً رضي الله عنه في فراشه وخرج مع أبي بكر إلى غار ثور، وحفظهما الله من المشركين الذين وصلوا إلى قرب الغار. ثم وصلا إلى قباء فالمدينة في سنة 622م، وكانت الهجرة بداية التقويم الهجري."
         },
         {
             id: 14,
@@ -625,9 +645,9 @@
             descTr: "Mescid-i Nebevi'nin inşası, Muhacir ile Ensar'ın kardeş ilan edilmesi ve Medine Sözleşmesi.",
             descEn: "Building Masjid al-Nabawi, establishing brotherhood between Muhajirun and Ansar, and Medina Charter.",
             descAr: "بناء المسجد النبوي، المؤاخاة بين المهاجرين والأنصار، وصحيفة المدينة.",
-            contentTr: "Medine'ye varır varmaz ilk iş olarak Mescid-i Nebevi inşa edildi. Mekkeli göçmenler (Muhacir) ile Medineli yardımcılar (Ensar) kardeş ilan edildi (Muahat). Ayrıca Yahudiler ve diğer kabilelerle birlikte yaşama esaslarını belirleyen 'Medine Sözleşmesi' (Anayasası) imzalandı.",
-            contentEn: "Detailed English text about Medina society...",
-            contentAr: "النص التفصيلي باللغة العربية عن بناء المجتمع المدني..."
+            contentTr: "Medine'ye varır varmaz ilk işlerinden biri Mescid-i Nebevi'yi inşa etmek oldu. Mekkeli göçmenler (Muhacir) ile Medineli yardımcılar (Ensar) kardeş ilan edildi (Muahat). Ayrıca Yahudiler ve diğer kabilelerle birlikte yaşama esaslarını belirleyen 'Medine Sözleşmesi' (Medine Vesikası) yazıldı.",
+            contentEn: "One of his first acts upon reaching Medina was building Masjid al-Nabawi. The Meccan emigrants (Muhajirun) and the Medinan helpers (Ansar) were declared brothers (Muakhat). The 'Charter of Medina' was also drawn up, setting out the principles of coexistence with the Jews and other tribes.",
+            contentAr: "بنى النبي ﷺ المسجد النبوي أول ما وصل، وآخى بين المهاجرين والأنصار، وكتب وثيقة المدينة التي نظّمت العيش المشترك بين المسلمين واليهود وسائر القبائل على أسس العدل والتعاون."
         },
         {
             id: 15,
@@ -639,9 +659,9 @@
             descTr: "313 Müslümanın sayıca çok üstün müşrik ordusuna karşı kazandığı ilk ve en büyük zafer.",
             descEn: "The first major military victory of Muslims against a superior polytheist army.",
             descAr: "أول معركة كبرى في الإسلام وانتصار المسلمين رغم قلة عددهم.",
-            contentTr: "Hicretin 2. yılı Ramazan ayında Mekkeli müşriklerin ticaret kervanını korumak için gelen ordusuyla Bedir kuyularında karşılaşıldı. 313 Müslüman, meleklerin yardımı ve ilahi nusretle bin kişilik müşrik ordusunu bozguna uğrattı. Bu zafer İslam devletinin gücünü tescilledi.",
-            contentEn: "Detailed English text about Battle of Badr...",
-            contentAr: "النص التفصيلي باللغة العربية عن غزوة بدر الكبرى..."
+            contentTr: "Hicretin 2. yılı Ramazan ayında, Mekkeli müşriklerin ticaret kervanını korumak için çıkardığı ordusuyla Bedir kuyuları başında karşılaşıldı. 313 Müslüman, meleklerin yardımı ve ilahi nusretle yaklaşık bin kişilik müşrik ordusunu bozguna uğrattı. Bu zafer Müslümanların Medine'deki konumunu güçlendirdi.",
+            contentEn: "In Ramadan of the 2nd year of the Hijra, the Muslims met the Meccan army, which had marched out to protect its trade caravan, at the wells of Badr. About 313 Muslims, aided by angels and divine help, defeated a polytheist army of around one thousand. This victory strengthened the position of the Muslims in Medina.",
+            contentAr: "في رمضان من السنة الثانية للهجرة التقى المسلمون وعددهم نحو 313 بجيش قريش وهم نحو ألف مقاتل عند آبار بدر، فنصرهم الله وأيدهم بالملائكة، وكان ذلك أول انتصار كبير للمسلمين."
         },
         {
             id: 16,
@@ -651,10 +671,11 @@
             titleAr: "غزوة أحد",
             badgeTr: "Savaş", badgeEn: "Battle", badgeAr: "أحد",
             descTr: "Bedir'in intikamı için gelen müşriklere karşı Uhud Dağı'nda verilen imtihan ve stratejik dersler.",
+            descEn: "The trial at Mount Uhud against the Meccans who came to avenge Badr, and its lessons.",
             descAr: "معركة أحد واستشهاد حمزة بن عبدالمطلب والدروس المستفادة.",
-            contentTr: "Mekkeliler Bedir'in intikamını almak için büyük bir orduyla Medine'ye yürüdü. Uhud Dağı eteklerinde yapılan savaşta ilk başta üstünlük sağlandıysa da, Ayneyn Geçidi'ndeki okçuların 'yerinizi terk etmeyin' emrini unutarak ganimet için yerlerini bırakması sonucunda savaşın seyri değişti. Hz. Hamza şehit düştü, Efendimiz yaralandı.",
-            contentEn: "Detailed English text about Battle of Uhud...",
-            contentAr: "النص التفصيلي باللغة العربية عن غزوة أحد..."
+            contentTr: "Mekkeliler Bedir'in intikamını almak için büyük bir orduyla Medine'ye yürüdü. Uhud Dağı eteklerinde yapılan savaşta ilk başta üstünlük sağlandı; ancak Ayneyn tepesindeki okçuların 'yerinizi terk etmeyin' emrine rağmen ganimet için yerlerini bırakması üzerine savaşın seyri değişti. Hz. Hamza şehit düştü, Efendimiz yaralandı.",
+            contentEn: "The Meccans marched on Medina with a large army to avenge Badr. In the battle at the foot of Mount Uhud the Muslims initially gained the upper hand, but the course of the battle changed when the archers on the hill left their posts for the spoils, despite the command not to leave their position. Hamza was martyred and the Prophet was wounded.",
+            contentAr: "خرجت قريش بجيش كبير للثأر لبدر، فالتقى الجيشان عند جبل أحد في السنة الثالثة للهجرة. بدأ النصر للمسلمين، لكن الرماة تركوا مواقعهم على الجبل طلباً للغنيمة مخالفين أمر النبي ﷺ، فتغيّرت المعركة، واستُشهد حمزة رضي الله عنه وجُرح النبي ﷺ."
         },
         {
             id: 17,
@@ -664,10 +685,11 @@
             titleAr: "غزوة الخندق (الأحزاب)",
             badgeTr: "Savaş", badgeEn: "Battle", badgeAr: "الخندق",
             descTr: "On bin kişilik müttefik orduya karşı Selman-ı Farisi'nin teklifiyle Medine etrafına hendek kazılması.",
+            descEn: "Digging a trench around Medina on Salman al-Farisi's advice against a 10,000-strong coalition.",
             descAr: "حفر الخندق حول المدينة المنورة لمواجهة تحالف الأحزاب.",
-            contentTr: "Hicretin 5. yılında Yahudilerin kışkırtmasıyla birleşen 10 bin kişilik Müşrik ve kabile ordusu (Ahzab) Medine'yi kuşattı. Sahabe Hz. Selman-ı Farisi'nin önerisiyle şehrin zayıf yönlerine hendekler kazdı. Şiddetli soğuk ve fırtına sayesinde müttefik ordu perişan olarak kuşatmayı kaldırmak zorunda kaldı.",
-            contentEn: "Detailed English text about Battle of the Trench...",
-            contentAr: "النص التفصيلي باللغة العربية عن غزوة الخندق..."
+            contentTr: "Hicretin 5. yılında Mekke müşrikleri ile müttefik kabilelerden oluşan yaklaşık 10 bin kişilik ordu (Ahzab) Medine'yi kuşattı. Sahabe, Hz. Selman-ı Farisi'nin önerisiyle şehrin savunmasız tarafına hendek kazdı. Aylar süren kuşatmanın ardından şiddetli soğuk ve fırtına yüzünden müttefik ordu dağılarak kuşatmayı kaldırmak zorunda kaldı.",
+            contentEn: "In the 5th year of the Hijra, an army of around 10,000 made up of the Meccan polytheists and allied tribes (the Confederates) besieged Medina. On the advice of Salman al-Farisi, the Companions dug a trench across the exposed side of the city. After a siege of several weeks, a bitter cold and a violent storm scattered the coalition, and it was forced to withdraw.",
+            contentAr: "في السنة الخامسة للهجرة تحالفت قريش وغطفان وغيرهما في نحو عشرة آلاف مقاتل لحصار المدينة، فحفر المسلمون الخندق بمشورة سلمان الفارسي رضي الله عنه. وبعد أيام من الحصار أرسل الله عليهم ريحاً وبرداً شديداً فانصرفوا خائبين."
         },
         {
             id: 18,
@@ -677,10 +699,11 @@
             titleAr: "صلح الحديبية وبيعة الرضوان",
             badgeTr: "Antlaşma", badgeEn: "Treaty", badgeAr: "الحديبية",
             descTr: "Umre niyetiyle yola çıkan Müslümanların Hudeybiye'de müşriklerle yaptığı stratejik barış antlaşması.",
+            descEn: "The strategic peace treaty made with the Quraysh at Hudaybiyyah by Muslims who set out for Umrah.",
             descAr: "معاهدة الصلح التاريخية مع قريش واعترافهم بالمسلمين كطرف سياسي.",
-            contentTr: "Hicretin 6. yılında umre yapmak üzere Mekke'ye hareket eden Müslümanlar Hudeybiye'de durduruldu. Savaş yerine barış yolu seçilerek 10 yıllık Hudeybiye Antlaşması imzalandı. İlk başta ağır şartlar gibi görünse de Kur'an'da 'Fetih-i Mübin' (apaçık fetih) olarak nitelendirildi ve İslam'ın yayılmasını hızlandırdı.",
-            contentEn: "Detailed English text about Hudaybiyyah...",
-            contentAr: "النص التفصيلي باللغة العربية عن صلح الحديبية..."
+            contentTr: "Hicretin 6. yılında umre yapmak üzere Mekke'ye hareket eden Müslümanlar Hudeybiye'de durduruldu. Sahabe ağacın altında Rıdvan Biatı'nı yaptı. Savaş yerine barış yolu seçilerek 10 yıllık Hudeybiye Antlaşması imzalandı. İlk bakışta ağır şartlar gibi görünse de Kur'an'da 'Fetih-i Mübin' (apaçık fetih) olarak nitelendirildi ve İslam'ın yayılmasını hızlandırdı.",
+            contentEn: "In the 6th year of the Hijra, Muslims who set out for Mecca to perform Umrah were stopped at Hudaybiyyah. The Companions gave the Pledge of Ridwan under the tree. Choosing peace over war, a ten-year treaty was signed. Although its terms looked harsh at first, the Qur'an described it as a 'clear victory' and it accelerated the spread of Islam.",
+            contentAr: "خرج النبي ﷺ ومعه نحو ألف وأربعمئة من أصحابه للعمرة في السنة السادسة للهجرة، فمنعتهم قريش في الحديبية. وبايع الصحابة تحت الشجرة بيعة الرضوان، ثم عُقد صلح لعشر سنين، وسمّاه القرآن فتحاً مبيناً لما جلبه من انتشار الإسلام."
         },
         {
             id: 19,
@@ -689,11 +712,12 @@
             titleEn: "Conquest of Khaybar and Battle of Mu'tah",
             titleAr: "فتح خيبر ومعركة مؤتة",
             badgeTr: "Savaş", badgeEn: "Battle", badgeAr: "خيبر",
-            descTr: "Yahudi fesat merkezinin ortadan kaldırılması (Hayber) ve Bizans imperatorluğuna karşı ilk askerî adım (Mute).",
+            descTr: "Medine'ye karşı düşmanlık yürüten Hayber kalelerinin fethi ve Bizans sınırında yapılan Mute Savaşı.",
+            descEn: "The conquest of the Khaybar fortresses and the Battle of Mu'tah on the Byzantine frontier.",
             descAr: "فتح حصون خيبر ومعركة مؤتة ضد الروم بقيادة زيد بن حارثة رضي الله عنه.",
-            contentTr: "Hicretin 7. yılında Müslümanların Medine'deki güvenliğini tehdit eden Hayber kaleleri fethedildi. Aynı yıllarda Bizans sınırında Müslüman elçinin şehit edilmesi üzerine Mute Savaşı yapıldı; Halid bin Velid'in stratejik dehasıyla İslam ordusu güvenle üsse döndü.",
-            contentEn: "Detailed English text about Khaybar and Mu'tah...",
-            contentAr: "النص التفصيلي باللغة العربية عن فتح خيبر ومعركة مؤتة..."
+            contentTr: "Hicretin 7. yılında Medine'ye karşı düşmanca ittifaklar yürüten Hayber kaleleri fethedildi. Hicretin 8. yılında Bizans sınırında elçi Hâris bin Umeyr'in öldürülmesi üzerine Mute Savaşı yapıldı. Komutanlar Zeyd, Cafer ve Abdullah bin Revâha şehit düşünce komutayı alan Halid bin Velid, stratejik ustalığıyla İslam ordusunu kayıpları azaltarak geri çekti.",
+            contentEn: "In the 7th year of the Hijra, the fortresses of Khaybar, which had been forging hostile alliances against Medina, were conquered. In the 8th year, the Battle of Mu'tah took place on the Byzantine frontier after the Prophet's envoy al-Harith ibn Umayr was killed. After the commanders Zayd, Ja'far and Abdullah ibn Rawahah were martyred, Khalid ibn al-Walid took command and withdrew the army with limited losses through his strategic skill.",
+            contentAr: "في السنة السابعة للهجرة فتح المسلمون حصون خيبر. وفي السنة الثامنة كانت غزوة مؤتة بعد قتل رسول النبي ﷺ الحارث بن عمير، فاستُشهد القادة الثلاثة زيد وجعفر وابن رواحة، وانسحب خالد بن الوليد بالجيش بحكمة ومهارة."
         },
         {
             id: 20,
@@ -703,10 +727,11 @@
             titleAr: "فتح مكة المكرمة",
             badgeTr: "Fetih", badgeEn: "Conquest", badgeAr: "الفتح",
             descTr: "Kureyş'in antlaşmayı bozması üzerine kansız bir şekilde Mekke'nin fethi ve genel af ilan edilmesi.",
+            descEn: "The nearly bloodless conquest of Mecca after the Quraysh broke the treaty, and the general amnesty.",
             descAr: "دخول مكة فاتحين دون قتال وعفو النبي عن أهل مكة (اذهبوا فأنتم الطلقاء).",
-            contentTr: "Müşriklerin Hudeybiye Antlaşması'nı ihlal etmesi üzerine Hz. Muhammed (SAV) 10 bin kişilik dev bir orduyla Mekke üzerine yürüdü. 8 Ocak 630'da şehir neredeyse hiç dirençle karşılaşılmadan kansız bir şekilde fethedildi. Kabe putlardan temizlendi ve yıllarca zulmeden Mekkelilere 'Bugün size kınama yok, serbestsiniz' denilerek af ilan edildi.",
-            contentEn: "Detailed English text about Conquest of Mecca...",
-            contentAr: "النص التفصيلي باللغة العربية عن فتح مكة..."
+            contentTr: "Müşriklerin müttefikleri aracılığıyla Hudeybiye Antlaşması'nı ihlal etmesi üzerine Hz. Muhammed (SAV) 10 bin kişilik ordusuyla Mekke üzerine yürüdü. Hicretin 8. yılı Ramazan ayında (Ocak 630) şehir neredeyse hiç direnişle karşılaşılmadan fethedildi. Kâbe putlardan temizlendi ve yıllarca zulmeden Mekkelilere 'Bugün size kınama yok, gidin, serbestsiniz' denilerek genel af ilan edildi.",
+            contentEn: "After the Quraysh, through their allies, violated the Treaty of Hudaybiyyah, the Prophet (PBUH) marched on Mecca with an army of 10,000. In Ramadan of the 8th year of the Hijra (January 630), the city was taken with almost no resistance. The Kaaba was cleansed of idols, and the Meccans who had persecuted the Muslims for years were granted a general amnesty with the words, 'No blame on you today; go, you are free.'",
+            contentAr: "نقضت قريش صلح الحديبية فسار النبي ﷺ بعشرة آلاف مقاتل في رمضان من السنة الثامنة للهجرة (يناير 630م)، فدخل مكة دون قتال يُذكر، وطهّر الكعبة من الأصنام، وعفا عن أهلها قائلاً: «اذهبوا فأنتم الطلقاء»."
         },
         {
             id: 21,
@@ -716,10 +741,11 @@
             titleAr: "غزوة حنين وغزوة تبوك",
             badgeTr: "Savaş", badgeEn: "Battle", badgeAr: "تبوك",
             descTr: "Mekke fethinden hemen sonra Huneyn'de kazanılan zafer ve Bizans sınırına yapılan son büyük Tebük Seferi.",
+            descEn: "The victory at Hunayn right after the conquest of Mecca and the final great expedition to Tabuk.",
             descAr: "معركة حنين ضد هوازن وثقيف وغزوة تبوك كآخر غزوة قادها النبي.",
-            contentTr: "Mekke fethinin ardından Hevazin kabilesiyle Huneyn'de zorlu bir savaş yapıldı, sabırla zafer kazanıldı. Hicretin 9. yılında ise Bizans'ın saldırı hazırlığı üzerine havanın çok sıcak ve kıtlık olmasına rağmen 30 bin kişilik orduyla Tebük'e yürüdü. Düşman korkup dağıldı; bu Efendimizin son gazvesidir.",
-            contentEn: "Detailed English text about Hunayn and Tabuk...",
-            contentAr: "النص التفصيلي باللغة العربية عن غزوة حنين وتبوك..."
+            contentTr: "Mekke fethinin ardından Hevazin ve Sakif kabileleriyle Huneyn'de zorlu bir savaş yapıldı; Efendimiz'in ve sahabenin sebatıyla zafer kazanıldı. Hicretin 9. yılında ise Bizans'ın saldırı hazırlığı haberi üzerine çok sıcak ve kıtlık olmasına rağmen yaklaşık 30 bin kişilik orduyla Tebük'e yürüdü. Düşman karşı koymadan geri çekildi; bu, Efendimiz'in son seferidir.",
+            contentEn: "After the conquest of Mecca, a difficult battle was fought at Hunayn against the Hawazin and Thaqif tribes, and victory came through the steadfastness of the Prophet and his Companions. In the 9th year of the Hijra, on news of Byzantine preparations, he marched to Tabuk with an army of about 30,000 despite the scorching heat and hardship. The enemy withdrew without fighting; this was the Prophet's last expedition.",
+            contentAr: "بعد فتح مكة قاتلت هوازن وثقيف المسلمين في حنين، ثم ثبت النبي ﷺ والمسلمون فانتصروا. وفي السنة التاسعة خرج النبي ﷺ بنحو ثلاثين ألفاً إلى تبوك في شدة الحر والعسرة لمواجهة الروم، فلم يلقَ كيداً، وكانت آخر غزواته."
         },
         {
             id: 22,
@@ -731,9 +757,9 @@
             descTr: "Ashabın tasviriyle Peygamberimizin mübarek yüzü, boyu, yürüyüşü ve nurani güzelliği.",
             descEn: "The detailed physical descriptions of the Prophet recorded by his companions.",
             descAr: "الوصف الدقيق لصفات النبي الخلقية كما رواها الصحابة الكرام.",
-            contentTr: "Hz. Muhammed (SAV) ne çok uzun ne çok kısa, orta boyluydu. Teni pembe beyaza meyilli nurlu, saçları hafif dalgalıydı. Mübarek yüzü dolunay gibi parıldardı. İki omuzunun arasında 'Nübüvvet Mührü' bulunuyordu. Yürürken öne doğru meyilli, hızlı ve vakarlı adımlar atardı. O'nu görenler heybetinden etkilenir, tanıdıkça derin bir sevgi duyarlardı.",
-            contentEn: "Detailed English text about Shama'il...",
-            contentAr: "النص التفصيلي باللغة العربية عن الشمائل الشريفة..."
+            contentTr: "Hz. Muhammed (SAV) ne çok uzun ne çok kısa, orta boyluydu. Teni parlak ve beyaza yakın, saçları ne düz ne kıvırcık, hafif dalgalıydı. Mübarek yüzü dolunay gibi parıldardı. İki omuzunun arasında 'Nübüvvet Mührü' bulunuyordu. Yürürken sanki yokuş aşağı iner gibi kuvvetli ve vakarlı adımlar atardı. O'nu ilk görenler heybetinden etkilenir, tanıdıkça derin bir sevgi duyarlardı.",
+            contentEn: "The Prophet (PBUH) was of medium height, neither tall nor short. His complexion was radiant and fair, his hair neither straight nor tightly curled but slightly wavy. His blessed face shone like the full moon, and between his shoulders was the 'Seal of Prophethood'. He walked with firm, dignified steps, as if descending a slope. Those who first saw him were struck by his awe-inspiring presence, and those who came to know him felt deep love for him.",
+            contentAr: "كان النبي ﷺ ربعة ليس بالطويل ولا بالقصير، مشرق اللون مائلاً إلى البياض، وجهه كالقمر، وشعره بين الاستقامة والجعودة، وبين كتفيه خاتم النبوة. وكان إذا مشى تقلّع كأنما ينحدر من صبب. من رآه بديهة هابه ومن خالطه أحبه."
         },
         {
             id: 23,
@@ -743,10 +769,11 @@
             titleAr: "خلقه العظيم ورحمته وحياته الأسرية",
             badgeTr: "Ahlak", badgeEn: "Character", badgeAr: "الأخلاق",
             descTr: "'Sen elbette yüce bir ahlak üzeresin' ayetinin tecellisi; eşlerine ve çocuklara olan şefkati.",
+            descEn: "The embodiment of the verse 'You are truly of a great moral character'; his compassion toward his family and children.",
             descAr: "أخلاقه الكريمة، رحمته بالناس، وحسن تعامله مع أهله.",
-            contentTr: "Efendimiz (SAV) hayatı boyunca asla kaba davranmamış, intikam almamıştır. Eşlerine ev işlerinde yardım eder, çocukları çok sever, torunları Hasan ve Hüseyin ile oyunlar oynardı. Hayvanlara ve bitkilere dahi merhamet edilmesini emretmiş, 'Ben ancak rahmet olarak gönderildim' buyurmuştur.",
-            contentEn: "Detailed English text about his character and family life...",
-            contentAr: "النص التفصيلي باللغة العربية عن خلقه ورحمته..."
+            contentTr: "Efendimiz (SAV) hayatı boyunca kaba davranmamış, şahsı için intikam almamıştır. Eşlerine ev işlerinde yardım eder, çocukları çok sever, torunları Hasan ve Hüseyin ile ilgilenirdi. Hayvanlara karşı merhametli olmayı öğütlemiş, 'Ben ancak âlemlere rahmet olarak gönderildim' buyurmuştur.",
+            contentEn: "Throughout his life the Prophet (PBUH) was never harsh and never took revenge for himself. He helped his wives with household chores, loved children dearly and showed affection to his grandsons Hasan and Husayn. He urged kindness to animals, and said that he was sent only as a mercy to the worlds.",
+            contentAr: "كان النبي ﷺ أحسن الناس خلقاً، لم يكن فاحشاً ولا منتقماً لنفسه. كان يخدم أهله في البيت، ويحب الأطفال، ويحنو على حفيديه الحسن والحسين، وأوصى بالرحمة بالحيوان. وقال: «إنما أنا رحمة مهداة»."
         },
         {
             id: 24,
@@ -755,11 +782,12 @@
             titleEn: "Farewell Pilgrimage and Sermon",
             titleAr: "حجة الوداع وخطبة الوداع التاريخية",
             badgeTr: "Veda", badgeEn: "Farewell", badgeAr: "الوداع",
-            descTr: "Hicretin 10. yılında yüz bin sahabeyle yaptığı tek haccı ve insanlığa bıraktığı evrensel insan hakları beyannamesi.",
+            descTr: "Hicretin 10. yılında yüz bini aşkın sahabeyle yaptığı tek haccı ve insanlığa bıraktığı evrensel öğütler.",
+            descEn: "His only pilgrimage in the 10th year of the Hijra with over a hundred thousand Companions, and his universal message to humanity.",
             descAr: "حجة الوداع في السنة العاشرة للهجرة وخطبته الجامعة التي تقرر حقوق الإنسان.",
-            contentTr: "Hicretin 10. yılında hayatının tek haccı olan Veda Haccı'nı ifa etti. Arafat'ta 100 binden fazla Müslümana irad ettiği Veda Hutbesi'nde; insan haklarını, can ve mal dokunulmazlığını, faizin ve kan davalarının kaldırıldığını, kadınların haklarını ve ırk üstünlüğünün ancak takva ile olacağını bütün dünyaya ilan etti.",
-            contentEn: "Detailed English text about Farewell Pilgrimage and Sermon...",
-            contentAr: "النص التفصيلي باللغة العربية عن حجة الوداع وخطبة الوداع..."
+            contentTr: "Hicretin 10. yılında hayatının tek haccı olan Veda Haccı'nı yaptı. Arafat'ta yüz binden fazla Müslümana irat ettiği Veda Hutbesi'nde; can ve mal dokunulmazlığını, faizin ve câhiliye kan davalarının kaldırıldığını, kadınlara iyi davranılmasını ve Arap'ın Arap olmayana üstünlüğünün ancak takva ile olabileceğini ilan etti.",
+            contentEn: "In the 10th year of the Hijra he performed the Farewell Pilgrimage, the only Hajj of his life. In his Farewell Sermon at Arafat, delivered to over a hundred thousand Muslims, he declared the sanctity of life and property, the abolition of usury and pre-Islamic blood feuds, the good treatment of women, and that no one has superiority over another except through piety.",
+            contentAr: "حجّ النبي ﷺ في السنة العاشرة للهجرة حجة الوداع، وخطب في عرفة نحو مئة ألف من الصحابة خطبة قرر فيها حرمة الدماء والأموال، ووضع الربا ودماء الجاهلية، وأوصى بالنساء خيراً، وأعلن أنه لا فضل لعربي على أعجمي إلا بالتقوى."
         },
         {
             id: 25,
@@ -769,10 +797,11 @@
             titleAr: "الالتحاق بالرفيق الأعلى ووفاته الشريفة",
             badgeTr: "Vefat", badgeEn: "Passing", badgeAr: "الوفاة",
             descTr: "Hicretin 11. yılı Rebiülevvel ayının 12. gününde Medine'de Yüce Rabbimizin rahmetine kavuşması.",
+            descEn: "His passing in Medina on the 12th of Rabi' al-Awwal in the 11th year of the Hijra.",
             descAr: "وفاته صلى الله عليه وسلم في المدينة المنورة في ربيع الأول من السنة 11 هجرية.",
-            contentTr: "Veda Haccı'ndan döndükten bir süre sonra ateşli bir hastalığa yakalandı. Son günlerinde ashabına namaz kıldırma görevini Hz. Ebû Bekir'e bıraktı. 'Rüfûk-i Âlâ'ya (Yüce Dosta) kavuşmayı dileyerek miladi 8 Haziran 632 (Hicri 11, Rebiülevvel 12) Pazartesi günü Medine'de Mescid-i Nebevi'ye bitişik olan Hz. Ayşe'nin odasında vefat etti.",
-            contentEn: "Detailed English text about his passing...",
-            contentAr: "النص التفصيلي باللغة العربية عن وفاته وانتقاله إلى الرفيق الأعلى..."
+            contentTr: "Veda Haccı'ndan döndükten bir süre sonra ateşli bir hastalığa yakalandı. Son günlerinde cemaate namaz kıldırma görevini Hz. Ebû Bekir'e bıraktı. 'Allah'ım, Rafîk-i A'lâ'yı (Yüce Dostu) dilerim' diyerek, miladi 8 Haziran 632 (Hicri 11, Rebiülevvel 12) Pazartesi günü Medine'de Mescid-i Nebevi'ye bitişik olan Hz. Âişe'nin odasında vefat etti.",
+            contentEn: "Some time after returning from the Farewell Pilgrimage, he fell ill with a fever. In his final days he assigned Abu Bakr to lead the congregation in prayer. Saying, 'O Allah, the Highest Companion,' he passed away on Monday, 8 June 632 CE (12 Rabi' al-Awwal, 11 AH), in the room of Aishah adjoining Masjid al-Nabawi in Medina.",
+            contentAr: "مرض النبي ﷺ بعد حجة الوداع، وأمر أبا بكر أن يصلي بالناس. وتوفي يوم الاثنين 12 ربيع الأول سنة 11هـ (8 يونيو 632م) في حجرة عائشة رضي الله عنها بجوار المسجد النبوي، وهو يقول: «اللهم الرفيق الأعلى»."
         }
     ];
 
@@ -812,55 +841,46 @@
     let currentFilter = 'all';
     let searchQuery = '';
 
+    // Seçili dildeki alanı getirir; yoksa Türkçe'ye düşer (undefined hatasını önler)
+    function pick(item, field) {
+        const suffix = activeLang === 'en' ? 'En' : (activeLang === 'ar' ? 'Ar' : 'Tr');
+        return item[field + suffix] || item[field + 'Tr'] || '';
+    }
+
+    function lower(s) {
+        return String(s).toLocaleLowerCase(activeLang === 'tr' ? 'tr' : undefined);
+    }
+
     // Listeyi Ekrana Basma (Çoklu Dil ve Arama Destekli)
     function renderList() {
         const listContainer = document.getElementById('contentList');
         listContainer.innerHTML = '';
+        const q = lower(searchQuery.trim());
 
-        let filtered = siyerData.filter(item => {
+        const filtered = siyerData.filter(item => {
             const matchesCategory = (currentFilter === 'all' || item.category === currentFilter);
-            
-            let title = item.titleTr;
-            let desc = item.descTr;
-            let content = item.contentTr;
-
-            if (activeLang === 'en') {
-                title = item.titleEn; desc = item.descEn; content = item.contentEn;
-            } else if (activeLang === 'ar') {
-                title = item.titleAr; desc = item.descAr; content = item.contentAr;
-            }
-
-            const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                  desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                  content.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = !q ||
+                lower(pick(item, 'title')).includes(q) ||
+                lower(pick(item, 'desc')).includes(q) ||
+                lower(pick(item, 'content')).includes(q);
             return matchesCategory && matchesSearch;
         });
 
         if (filtered.length === 0) {
-            listContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px; font-size:0.9rem;">Aradığınız kriterde konu bulunamadı.</div>';
+            listContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px; font-size:0.9rem;">' + t.no_result + '</div>';
             return;
         }
 
         filtered.forEach(item => {
-            let title = item.titleTr;
-            let badge = item.badgeTr;
-            let desc = item.descTr;
-
-            if (activeLang === 'en') {
-                title = item.titleEn; badge = item.badgeEn; desc = item.descEn;
-            } else if (activeLang === 'ar') {
-                title = item.titleAr; badge = item.badgeAr; desc = item.descAr;
-            }
-
             const card = document.createElement('div');
             card.className = 'siyer-card';
             card.onclick = () => openDetail(item.id);
             card.innerHTML = `
                 <div class="siyer-card-title">
-                    ${title}
-                    <span class="badge">${badge}</span>
+                    <span>${pick(item, 'title')}</span>
+                    <span class="badge">${pick(item, 'badge')}</span>
                 </div>
-                <div class="siyer-card-desc">${desc}</div>
+                <div class="siyer-card-desc">${pick(item, 'desc')}</div>
             `;
             listContainer.appendChild(card);
         });
@@ -882,17 +902,8 @@
         const item = siyerData.find(i => i.id === id);
         if (!item) return;
 
-        let title = item.titleTr;
-        let content = item.contentTr;
-
-        if (activeLang === 'en') {
-            title = item.titleEn; content = item.contentEn;
-        } else if (activeLang === 'ar') {
-            title = item.titleAr; content = item.contentAr;
-        }
-
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalBody').innerText = content;
+        document.getElementById('modalTitle').innerText = pick(item, 'title');
+        document.getElementById('modalBody').innerText = pick(item, 'content');
         document.getElementById('detailModal').style.display = 'flex';
     }
 
@@ -904,6 +915,10 @@
         if (e.target.id === 'detailModal') closeModal();
     }
 
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+    });
+
     window.onload = () => {
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -912,6 +927,9 @@
                 else el.innerHTML = t[key];
             }
         });
+
+        const si = document.getElementById('searchInput');
+        if (si && t.search_ph) si.placeholder = t.search_ph;
 
         renderList();
     };
