@@ -5,36 +5,49 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+
     <script>
-        // Tema ve Özel Renk Paleti Kontrolü (Titremeyi önlemek için en başta çalışır)
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'light' || (!savedTheme && !systemPrefersDark)) {
-            document.documentElement.classList.add('light-mode');
-            document.body && document.body.classList.add('light-mode');
-        }
+        // Tema, özel renk paleti ve dil yönü (titremeyi önlemek için en başta çalışır)
+        (function () {
+            const d = document.documentElement;
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isLight = savedTheme === 'light' || (!savedTheme && !systemPrefersDark);
+            if (isLight) d.classList.add('light-mode');
+            const a = localStorage.getItem('custom_accent');
+            const t = localStorage.getItem('custom_text');
+            const b = localStorage.getItem('custom_bg');
+            if (a) d.style.setProperty('--accent-color', a);
+            if (t) d.style.setProperty('--text-color', t);
+            if (b) {
+                d.style.setProperty('--bg-color', b);
+                d.style.setProperty('--card-bg', b);
+            }
+            // Özel arka plan var, yazı rengi seçilmemişse okunabilir renkleri zeminin açıklığına göre seç
+            if (b && !t) {
+                const m = /^#([0-9a-f]{6})$/i.exec(b.trim());
+                if (m) {
+                    const n = parseInt(m[1], 16);
+                    const lin = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+                    const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+                    const bgIsLight = L > 0.18;
+                    d.style.setProperty('--text-color', bgIsLight ? '#0f172a' : '#f8fafc');
+                    d.style.setProperty('--text-muted', bgIsLight ? '#475569' : '#cbd5e1');
+                    d.style.setProperty('--border-color', bgIsLight ? 'rgba(15,23,42,0.18)' : 'rgba(248,250,252,0.22)');
+                }
+            }
+            // Safari üst/alt çubuğu sayfa zemin rengine uysun
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', b || (isLight ? '#f8fafc' : '#0f172a'));
 
-        const savedAccent = localStorage.getItem('custom_accent');
-        const savedBg = localStorage.getItem('custom_bg');
-        const savedText = localStorage.getItem('custom_text');
-
-        if (savedAccent) document.documentElement.style.setProperty('--accent-color', savedAccent);
-        if (savedBg) {
-            document.documentElement.style.setProperty('--bg-color', savedBg);
-            document.documentElement.style.setProperty('--card-bg', savedBg);
-        }
-        if (savedText) document.documentElement.style.setProperty('--text-color', savedText);
-
-        const currentLang = localStorage.getItem('user_lang') || 'tr';
-        if (currentLang === 'ar') {
-            document.documentElement.setAttribute('dir', 'rtl');
-        } else {
-            document.documentElement.setAttribute('dir', 'ltr');
-        }
+            // Dil yönü
+            d.setAttribute('dir', (localStorage.getItem('user_lang') || 'tr') === 'ar' ? 'rtl' : 'ltr');
+        })();
     </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title data-i18n="page_title">Siyer-i Nebi | Ayetin Vakti</title>
 
     <meta property="og:title" content="Siyer-i Nebi | Ayetin Vakti">
@@ -53,9 +66,10 @@
             --btn-bg: rgba(255, 255, 255, 0.05);
             --btn-hover: rgba(255, 255, 255, 0.1);
             --shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            color-scheme: dark;
         }
 
-        html.light-mode, body.light-mode {
+        html.light-mode {
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --accent-color: #059669;
@@ -66,7 +80,11 @@
             --btn-bg: #f1f5f9;
             --btn-hover: #e2e8f0;
             --shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            color-scheme: light;
         }
+
+        /* Tuşlara ard arda basınca sayfa yakınlaşmasın */
+        html, body, button, a, select, input, label, [onclick] { touch-action: manipulation; }
 
         * {
             box-sizing: border-box;
@@ -132,8 +150,10 @@
             text-decoration: none;
         }
 
-        .home-btn:hover, .theme-icon-btn:hover {
-            background-color: var(--btn-hover);
+        @media (hover: hover) {
+            .home-btn:hover, .theme-icon-btn:hover {
+                background-color: var(--btn-hover);
+            }
         }
 
         .header {
@@ -362,7 +382,7 @@
     <div class="navbar">
         <a href="../" class="home-btn" title="Ana Sayfa">←</a>
         <div class="nav-right-group">
-            <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir">☀️</button>
+            <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir">🌙</button>
         </div>
     </div>
 
@@ -805,38 +825,29 @@
         }
     ];
 
-    const themeBtn = document.getElementById('theme-btn');
-
-    function updateThemeButton(isLight) {
-        if (themeBtn) themeBtn.textContent = isLight ? '☀️' : '🌙';
+    // --- TEMA YÖNETİMİ ---
+    function updateThemeButton() {
+        const btn = document.getElementById('theme-btn');
+        if (btn) btn.textContent = document.documentElement.classList.contains('light-mode') ? '☀️' : '🌙';
     }
 
-    function setTheme(isLight) {
-        if (isLight) {
-            document.documentElement.classList.add('light-mode');
-            document.body.classList.add('light-mode');
-            localStorage.setItem('theme', 'light');
-        } else {
-            document.documentElement.classList.remove('light-mode');
-            document.body.classList.remove('light-mode');
-            localStorage.setItem('theme', 'dark');
-        }
-        updateThemeButton(isLight);
+    // Safari üst/alt çubuğu sayfa zemin rengine uysun
+    function updateThemeColor() {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+        if (bg) meta.setAttribute('content', bg);
     }
 
     function toggleTheme() {
-        const isLight = document.documentElement.classList.contains('light-mode');
-        setTheme(!isLight);
+        const isLight = document.documentElement.classList.toggle('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeButton();
+        updateThemeColor();
     }
 
-    const savedThemeInitial = localStorage.getItem('theme');
-    const systemPrefersDarkInitial = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isLightInitial = (savedThemeInitial === 'light') || (!savedThemeInitial && !systemPrefersDarkInitial);
-    if (isLightInitial) {
-        document.documentElement.classList.add('light-mode');
-        document.body.classList.add('light-mode');
-    }
-    updateThemeButton(isLightInitial);
+    updateThemeButton();
+    updateThemeColor();
 
     let currentFilter = 'all';
     let searchQuery = '';
