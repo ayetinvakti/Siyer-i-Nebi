@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <script src="https://ayetinvakti.github.io/finish.js?v=5"></script>
     <script src="https://ayetinvakti.github.io/menu.js" defer></script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -383,11 +384,11 @@
 <div class="container">
     <div class="navbar">
         <div class="nav-group">
-            <a href="https://ayetinvakti.github.io/" class="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa">←</a>
-            <button class="theme-icon-btn" data-drawer-toggle aria-label="Menü" aria-controls="avmDrawer" title="Menü">☰</button>
+            <a href="https://ayetinvakti.github.io/" class="home-btn fin-btn" title="Ana Sayfa" aria-label="Ana Sayfa">←</a>
+            <button class="theme-icon-btn fin-btn" data-drawer-toggle aria-label="Menü" aria-controls="avmDrawer" title="Menü">☰</button>
         </div>
         <div class="nav-right-group">
-            <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir">🌙</button>
+            <button class="theme-icon-btn fin-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir">🌙</button>
         </div>
     </div>
 
@@ -403,12 +404,12 @@
 
     <!-- Dönem Sekmeleri -->
     <div class="category-tabs" id="categoryTabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)" data-i18n="tab_all">Tümü</button>
-        <button class="tab-btn" onclick="filterCategory('dogus', this)" data-i18n="tab_dogus">Doğuş</button>
-        <button class="tab-btn" onclick="filterCategory('mekke', this)" data-i18n="tab_mekke">Mekke</button>
-        <button class="tab-btn" onclick="filterCategory('medine', this)" data-i18n="tab_medine">Medine</button>
-        <button class="tab-btn" onclick="filterCategory('ahlak', this)" data-i18n="tab_ahlak">Ahlak</button>
-        <button class="tab-btn" onclick="filterCategory('veda', this)" data-i18n="tab_veda">Veda</button>
+        <button class="tab-btn active fin-btn" onclick="filterCategory('all', this)" data-i18n="tab_all">Tümü</button>
+        <button class="tab-btn fin-btn" onclick="filterCategory('dogus', this)" data-i18n="tab_dogus">Doğuş</button>
+        <button class="tab-btn fin-btn" onclick="filterCategory('mekke', this)" data-i18n="tab_mekke">Mekke</button>
+        <button class="tab-btn fin-btn" onclick="filterCategory('medine', this)" data-i18n="tab_medine">Medine</button>
+        <button class="tab-btn fin-btn" onclick="filterCategory('ahlak', this)" data-i18n="tab_ahlak">Ahlak</button>
+        <button class="tab-btn fin-btn" onclick="filterCategory('veda', this)" data-i18n="tab_veda">Veda</button>
     </div>
 
     <!-- Konu Kartları Listesi -->
@@ -419,10 +420,10 @@
 
 <!-- Detay Okuma Paneli -->
 <div class="modal-overlay" id="detailModal" onclick="closeModalOutside(event)">
-    <div class="modal-sheet">
+    <div class="modal-sheet fin-card">
         <div class="modal-header-row">
             <div class="modal-title-text" id="modalTitle">Konu Başlığı</div>
-            <button class="close-modal-btn" onclick="closeModal()">✕</button>
+            <button class="close-modal-btn fin-btn" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-body-text" id="modalBody">
             İçerik buraya gelecek...
@@ -889,7 +890,7 @@
 
         filtered.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'siyer-card';
+            card.className = 'siyer-card fin-card';
             card.onclick = () => openDetail(item.id);
             card.innerHTML = `
                 <div class="siyer-card-title">
